@@ -932,40 +932,48 @@
       try {
         var DPR = 2;
         var logicalW = 1240;
-        var svgNS = 'http://www.w3.org/2000/svg';
-        var xhtmlNS = 'http://www.w3.org/1999/xhtml';
 
         var clone = certEl.cloneNode(true);
         clone.style.width = logicalW + 'px';
         clone.style.margin = '0';
         clone.style.boxSizing = 'border-box';
+        clone.classList.add('in');
         clone.className = (clone.className ? clone.className + ' ' : '') + 'cert-export';
 
-        var svg = document.createElementNS(svgNS, 'svg');
-        svg.setAttribute('width', logicalW);
-        svg.style.cssText = 'position:absolute;left:-99999px;top:0;';
+        var meas = document.createElement('div');
+        meas.style.cssText = 'position:absolute;left:-99999px;top:0;width:' + logicalW + 'px;visibility:hidden;';
+        meas.appendChild(clone);
+        document.body.appendChild(meas);
+        var logicalH = Math.max(Math.round(clone.getBoundingClientRect().height), 700);
+        document.body.removeChild(meas);
 
-        var fo = document.createElementNS(svgNS, 'foreignObject');
-        fo.setAttribute('width', '100%');
-        fo.setAttribute('height', '100%');
+        var cssText = '';
+        if (window.EXPORT_CSS) {
+          cssText = window.EXPORT_CSS;
+        } else {
+          try {
+            for (var i = 0; i < document.styleSheets.length; i++) {
+              var sheet = document.styleSheets[i];
+              var rules = null;
+              try { rules = sheet.cssRules; } catch (e) { rules = null; }
+              if (!rules) continue;
+              for (var j = 0; j < rules.length; j++) {
+                cssText += rules[j].cssText + '\n';
+              }
+            }
+          } catch (e) {}
+        }
 
-        var div = document.createElementNS(xhtmlNS, 'div');
-        div.setAttribute('xmlns', xhtmlNS);
-        div.style.width = logicalW + 'px';
-        div.appendChild(clone);
+        var svgDoc = '<svg xmlns="http://www.w3.org/2000/svg" width="' + logicalW + '" height="' + logicalH + '">' +
+          '<foreignObject width="100%" height="100%">' +
+          '<div xmlns="http://www.w3.org/1999/xhtml" style="width:' + logicalW + 'px;">' +
+          (cssText ? '<style>' + cssText + '</style>' : '') +
+          clone.outerHTML +
+          '</div></foreignObject></svg>';
 
-        fo.appendChild(div);
-        svg.appendChild(fo);
-        document.body.appendChild(svg);
-
-        var rect = clone.getBoundingClientRect();
-        var logicalH = Math.max(Math.round(rect.height), 700);
-        svg.setAttribute('width', logicalW);
-        svg.setAttribute('height', logicalH);
-        fo.setAttribute('width', logicalW);
-        fo.setAttribute('height', logicalH);
-
-        var draw = function () {
+        var url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgDoc);
+        var img = new Image();
+        img.onload = function () {
           try {
             var canvas = document.createElement('canvas');
             canvas.width = Math.round(logicalW * DPR);
@@ -973,20 +981,16 @@
             var ctx = canvas.getContext('2d');
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(svg, 0, 0, canvas.width, canvas.height);
-            document.body.removeChild(svg);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             resolve({ canvas: canvas, width: canvas.width, height: canvas.height });
           } catch (err) {
-            if (svg.parentNode) svg.parentNode.removeChild(svg);
             reject(err);
           }
         };
-
-        if (document.fonts && document.fonts.ready) {
-          document.fonts.ready.then(draw).catch(draw);
-        } else {
-          draw();
-        }
+        img.onerror = function () {
+          reject(new Error('Could not rasterize the certificate image.'));
+        };
+        img.src = url;
       } catch (err) {
         reject(err);
       }
@@ -1092,10 +1096,10 @@
         closeDownloadModal();
         toast(kind === 'pdf' ? 'Certificate downloaded as PDF' : 'Certificate downloaded as JPG');
       })
-      .catch(function (err) {
-        setModalBusy(false);
-        toast('Could not generate the certificate. Please try again.');
-      });
+.catch(function (err) {
+            setModalBusy(false);
+            toast('Could not generate the certificate. Please try again.');
+          });
   }
 
   function openDownloadModal() {

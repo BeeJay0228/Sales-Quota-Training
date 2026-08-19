@@ -3,9 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <title>TEST-VIEW</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" href="css/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 <body>
+<div class="app">
+    <aside class="sidebar" id="sidebar" aria-label="Course navigation">
+      <div class="sidebar-brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2l8 3v6c0 5.2-3.4 9.2-8 11-4.6-1.8-8-5.8-8-11V5l8-3z" fill="rgba(0,185,112,.16)" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M9 12.2l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">PalmPay</span>
+          <span class="brand-sub">Loan Sales Academy</span>
+        </div>
+        <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <nav class="sidebar-nav" id="sidebarNav"></nav>
+      <div class="sidebar-footer">
+        <div class="mini-progress">
+          <div class="mini-progress-top">
+            <span class="mini-progress-label">Training Progress</span>
+            <span class="mini-progress-value" id="miniProgressValue">0%</span>
+          </div>
+          <div class="mini-progress-track">
+            <div class="mini-progress-fill" id="miniProgressFill"></div>
+          </div>
+          <div class="mini-progress-sub" id="miniProgressSub">0 / 4 sections completed</div>
+        </div>
+      </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+    <div class="main">
+      <header class="topbar">
+        <button class="menu-toggle" id="menuToggle" aria-label="Open navigation menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div class="topbar-crumb" id="topbarCrumb">Dashboard</div>
+        <div class="topbar-right">
+          <span class="topbar-chip topbar-chip-date">August 2026</span>
+          <span class="topbar-chip topbar-chip-progress" id="topbarProgress">0 / 4 Sections</span>
+        </div>
+      </header>
+      <main class="content" id="view" aria-live="polite"></main>
+      <footer class="app-footer">
+        <span>Sales Quota Training · PalmPay Loan Sales Academy</span>
+        <span>Training material dated August 2026</span>
+      </footer>
+    </div>
+  </div>
+  <div class="dl-modal" id="dlModal" role="dialog" aria-modal="true" aria-label="Download Certificate" aria-hidden="true">
+    <div class="dl-backdrop" data-dl="backdrop"></div>
+    <div class="dl-card">
+      <button type="button" class="dl-close" data-dl="cancel" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="dl-head">
+        <div class="dl-head-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        </div>
+        <div>
+          <h3 class="dl-title">Download Certificate</h3>
+          <p class="dl-sub">Choose your preferred format</p>
+        </div>
+      </div>
+      <div class="dl-options">
+        <button type="button" class="dl-opt" data-dl="pdf"><span class="dl-opt-text"><strong>PDF</strong><em>Download as PDF</em></span></button>
+        <button type="button" class="dl-opt" data-dl="jpg"><span class="dl-opt-text"><strong>JPG</strong><em>Download as JPG</em></span></button>
+      </div>
+      <button type="button" class="btn btn-ghost dl-cancel" data-dl="cancel">Cancel</button>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 (function(){
   try{
@@ -29,12 +106,19 @@ window.addEventListener('load', function(){
       var certNav = document.querySelector('[data-nav="certificate"]');
       if (certNav) certNav.click();
       setTimeout(function(){
+        var nameInput = document.getElementById('certName');
         var dlBtn = document.querySelector('[data-action="download-cert"]');
-        if (dlBtn) dlBtn.click();
+        var certNameEl = document.querySelector('#certificate .cert-name');
+        document.title = 'RESULT:NAME_INPUT=' + (nameInput ? 'YES' : 'NO') +
+          '|DL_BTN=' + (dlBtn ? 'YES' : 'NO') +
+          '|CERT_RENDERED=' + (certNameEl ? 'YES' : 'NO') +
+          '|CERT_TEXT=' + (certNameEl ? certNameEl.textContent : '') +
+          '|LOCKED=' + (document.querySelector('.cert-locked') ? 'YES' : 'NO');
       }, 400);
     }, 500);
   };
   document.body.appendChild(s);
+  window.addEventListener('error', function(e){ document.title = 'ERR:' + e.message; });
 });
 </script>
 </body>

@@ -205,7 +205,14 @@ window.COURSE = {
             { type: "text", html: "The system places each BD into a risk level. <strong>Select each level</strong> to explore how risk maps to quota." },
             {
               type: "levels",
-              note: "A = Highest · E = Lowest"
+              note: "A = Highest · E = Lowest",
+              levels: [
+                { key: "A", note: "Higher risk level - healthiest quota" },
+                { key: "B", note: "High risk level - Healthy quota" },
+                { key: "C", note: "Moderate risk level - moderate quota" },
+                { key: "D", note: "Low risk level - low quota" },
+                { key: "E", note: "Lowest risk level - lowest quota" }
+              ]
             },
             {
               type: "cards",
@@ -540,147 +547,147 @@ window.ASSESSMENT = {
     {
       q: "What is Sales Quota?",
       options: [
-        "A weekly credit control rule for each BD",
         "A monthly sales target for the branch",
+        "A weekly credit control rule for each BD",
         "A daily limit on customer visits",
         "A reward for top sales performers"
       ],
-      answer: 0
+      answer: 1
     },
     {
       q: "Sales Quota is based on which two factors?",
       options: [
-        "BD risk performance and customer quality",
         "Customer age and loan size",
         "Number of sales and call duration",
-        "Merchant location and product type"
+        "Merchant location and product type",
+        "BD risk performance and customer quality"
       ],
-      answer: 0
+      answer: 3
     },
     {
       q: "Which two dimensions does the system use to control quota?",
       options: [
         "Credit Users and Credit Amount",
+        "Sales target and commission",
         "Loan amount and interest rate",
-        "Risk level and repayment term",
-        "Sales target and commission"
+        "Risk level and repayment term"
       ],
       answer: 0
     },
     {
       q: "A BD has used 10 / 10 Credit Users but still has ₦4M remaining in Credit Amount. What happens to additional customers?",
       options: [
-        "They may be blocked because Credit Users has reached its limit",
         "They proceed normally using the remaining ₦4M",
         "The Credit Amount resets automatically",
+        "They may be blocked because Credit Users has reached its limit",
         "The quota is temporarily increased"
       ],
-      answer: 0
+      answer: 2
     },
     {
       q: "Which system message appears when the BD's Sales Quota has already been fully utilized?",
-      options: ["RJ020", "RJ021", "RJ019", "FPD7"],
-      answer: 0
+      options: ["RJ019", "FPD7", "RJ020", "RJ021"],
+      answer: 2
     },
     {
       q: "Which system message appears when the BD's Sales Quota is frozen and associated customers cannot proceed with borrowing?",
-      options: ["RJ021", "RJ020", "RJ022", "FPD1"],
-      answer: 0
+      options: ["FPD1", "RJ022", "RJ020", "RJ021"],
+      answer: 3
     },
     {
       q: "In quota stratification, which risk level is the HIGHEST?",
-      options: ["A", "B", "D", "E"],
+      options: ["A", "E", "D", "B"],
       answer: 0
     },
     {
       q: "Which statement about risk levels and quota is correct?",
       options: [
-        "Higher Risk Level → More Healthy Quota",
         "Risk levels are permanent and never change",
+        "Higher Risk Level → More Healthy Quota",
         "Lower Risk Level → Restricted or Zero Quota",
         "Risk level is decided once per quarter"
       ],
-      answer: 0
+      answer: 1
     },
     {
       q: "When does the quota reset and clear?",
       options: [
-        "Every Monday 00:00",
-        "Every Sunday 23:59",
         "Every Friday at close",
-        "On the 1st of each month"
+        "Every Sunday 23:59",
+        "On the 1st of each month",
+        "Every Monday 00:00"
       ],
-      answer: 0
+      answer: 3
     },
     {
       q: "What happens to unused quota at the end of the week?",
       options: [
+        "It is added to the Credit Amount",
         "It does not carry over",
         "It carries over to the following week",
-        "It is added to the Credit Amount",
         "It converts into a temporary adjustment"
       ],
-      answer: 0
+      answer: 1
     },
     {
       q: "What makes used quota available again?",
       options: [
         "Customer repayment",
+        "Waiting for the Monday rating",
         "Submitting a temporary adjustment",
-        "Making more sales calls",
-        "Waiting for the Monday rating"
+        "Making more sales calls"
       ],
       answer: 0
     },
     {
       q: "What are the FPD targets BDs must maintain?",
       options: [
-        "FPD7 ≤ 10% and FPD1 ≤ 30%",
         "FPD7 ≤ 30% and FPD1 ≤ 10%",
         "FPD7 ≤ 20% and FPD1 ≤ 40%",
+        "FPD7 ≤ 10% and FPD1 ≤ 30%",
         "FPD7 ≤ 5% and FPD1 ≤ 15%"
       ],
-      answer: 0
+      answer: 2
     },
     {
       q: "How long is a temporary quota adjustment valid?",
       options: [
+        "For one business day",
         "Only for the current week, expiring at the next Monday rating cycle",
         "Until the end of the month",
-        "Permanently once approved",
-        "For one business day"
+        "Permanently once approved"
       ],
-      answer: 0
+      answer: 1
     },
     {
       q: "When is a Return Call typically conducted after a customer uses credit?",
       options: [
         "4–11 days after credit utilization",
         "On the same day as utilization",
-        "30 days after utilization",
-        "Only after a customer becomes overdue"
+        "Only after a customer becomes overdue",
+        "30 days after utilization"
       ],
       answer: 0
     },
     {
       q: "Which of these is a zero-tolerance principle in this training?",
       options: [
-        "No agency, packaging or misleading sales, and no private collection of money from merchants",
         "Using all available quota as quickly as possible",
+        "Relying on temporary adjustments every week",
         "Introducing customers without verifying repayment capacity",
-        "Relying on temporary adjustments every week"
+        "No agency, packaging or misleading sales, and no private collection of money from merchants"
       ],
-      answer: 0
+      answer: 3
     },
     {
       q: "Which is the right sales quota mindset?",
       options: [
-        "“I need to use my quota on the right customers.”",
-        "“I need to use all my quota.”",
         "“Sales Quota is a restriction I must overcome.”",
+        "“I need to use all my quota.”",
+        "“I need to use my quota on the right customers.”",
         "“Temporary adjustments replace good performance.”"
       ],
-      answer: 0
+      answer: 2
     }
   ]
 };

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TEST-RISK</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<script>
+(function(){
+  try{
+    localStorage.setItem('palmpay_sqt_v1', JSON.stringify({
+      completedSections:[], current:{section:1,topic:5}, assessment:null, completed:false, name:''
+    }));
+  }catch(e){}
+})();
+</script>
+<script src="js/course-data.js"></script>
+<script>
+window.addEventListener('load', function(){
+  var s = document.createElement('script');
+  s.src = 'js/app.js';
+  s.onload = function(){
+    setTimeout(function(){
+      var navBtn = document.querySelector('[data-nav="section"][data-si="1"]');
+      if (navBtn) navBtn.click();
+      setTimeout(function(){
+        var pill = document.querySelector('.topic-pill[data-topic="5"]');
+        if (pill) pill.click();
+        setTimeout(function(){
+          function grab(){
+            var letter = document.querySelector('[data-ld-letter]');
+            var map = document.querySelector('[data-ld-map]');
+            var det = document.querySelector('[data-level-detail]');
+            var active = document.querySelector('.level.active');
+            return {
+              letter: letter ? letter.textContent : null,
+              map: map ? map.textContent : null,
+              detailClass: det ? det.className : null,
+              activeKey: active ? active.getAttribute('data-level') : null
+            };
+          }
+          var a = grab();
+          var eBtn = document.querySelector('.level[data-level="E"]');
+          if (eBtn) eBtn.click();
+          var ae = grab();
+          var bBtn = document.querySelector('.level[data-level="B"]');
+          if (bBtn) bBtn.click();
+          var ab = grab();
+          document.title = 'RESULT:A=' + JSON.stringify(a) + '|E=' + JSON.stringify(ae) + '|B=' + JSON.stringify(ab);
+        }, 500);
+      }, 400);
+    }, 500);
+  };
+  document.body.appendChild(s);
+  window.addEventListener('error', function(e){ document.title = 'ERR:' + e.message; });
+});
+</script>
+</body>
+</html>

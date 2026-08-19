@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TEST-CERT-DOWNLOADS</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<script>
+(function(){
+  try{
+    localStorage.setItem('palmpay_sqt_v1', JSON.stringify({
+      completedSections:['s1','s2','s3','s4'],
+      current:{section:0,topic:0},
+      assessment:{score:16,total:16,pct:100,passed:true,date:new Date().toISOString()},
+      completed:true,
+      name:'John Doe'
+    }));
+  }catch(e){}
+  window.__dls = [];
+  var realCreate = URL.createObjectURL.bind(URL);
+  URL.createObjectURL = function(blob){
+    window.__dls.push({kind:'blob', type: blob && blob.type, size: blob && blob.size});
+    return realCreate(blob);
+  };
+  var realClick = HTMLAnchorElement.prototype.click;
+  HTMLAnchorElement.prototype.click = function(){
+    if (this.download) window.__dls.push({kind:'file', download: this.download});
+    return realClick.call(this);
+  };
+})();
+</script>
+<script src="js/course-data.js"></script>
+<script>
+window.addEventListener('load', function(){
+  var s = document.createElement('script');
+  s.src = 'js/app.js';
+  s.onerror = function(){ document.title = 'ERR:APP_SCRIPT_LOAD_FAILED'; };
+  s.onload = function(){
+    setTimeout(function(){
+      var certNav = document.querySelector('[data-nav="certificate"]');
+      if (certNav) certNav.click();
+      setTimeout(function(){
+        var dlBtn = document.querySelector('[data-action="download-cert"]');
+        if (!dlBtn) { document.title = 'TEST:NO_DL_BTN'; return; }
+        dlBtn.click();
+        setTimeout(function(){
+          var modal = document.getElementById('dlModal');
+          document.title = 'TEST1:MODAL=' + (modal && modal.classList.contains('show') ? 'OPEN' : 'CLOSED');
+          var pdfBtn = modal.querySelector('[data-dl="pdf"]');
+          if (pdfBtn) pdfBtn.click();
+          setTimeout(function(){
+            setTimeout(function(){
+              var dlBtn2 = document.querySelector('[data-action="download-cert"]');
+              if (dlBtn2) dlBtn2.click();
+              setTimeout(function(){
+                var modal2 = document.getElementById('dlModal');
+                var jpgBtn = modal2.querySelector('[data-dl="jpg"]');
+                if (jpgBtn) jpgBtn.click();
+                setTimeout(function(){
+                  var files = window.__dls.filter(function(d){return d.kind==='file';}).map(function(d){return d.download;});
+                  var blobs = window.__dls.filter(function(d){return d.kind==='blob';});
+                  document.title = 'RESULT:FILES=' + files.join(';') + '|BLOBTYPES=' + blobs.map(function(b){return b.type;}).join(';') + '|BLOBSIZES=' + blobs.map(function(b){return b.size;}).join('|');
+                }, 15000);
+              }, 400);
+            }, 600);
+          }, 15000);
+        }, 400);
+      }, 400);
+    }, 500);
+  };
+  document.body.appendChild(s);
+  window.addEventListener('error', function(e){ document.title = 'ERR:' + e.message; });
+});
+</script>
+</body>
+</html>

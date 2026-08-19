@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TEST-VIEW</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<script>
+(function(){
+  try{
+    localStorage.setItem('palmpay_sqt_v1', JSON.stringify({
+      completedSections:['s1','s2','s3','s4'],
+      current:{section:0,topic:0},
+      assessment:{score:16,total:16,pct:100,passed:true,date:new Date().toISOString()},
+      completed:true,
+      name:'John Doe'
+    }));
+  }catch(e){}
+})();
+</script>
+<script src="js/course-data.js"></script>
+<script>
+window.addEventListener('load', function(){
+  var s = document.createElement('script');
+  s.src = 'js/app.js';
+  s.onload = function(){
+    setTimeout(function(){
+      var certNav = document.querySelector('[data-nav="certificate"]');
+      if (certNav) certNav.click();
+      setTimeout(function(){
+        var dlBtn = document.querySelector('[data-action="download-cert"]');
+        if (dlBtn) dlBtn.click();
+      }, 400);
+    }, 500);
+  };
+  document.body.appendChild(s);
+});
+</script>
+</body>
+</html>

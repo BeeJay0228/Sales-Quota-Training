@@ -33,7 +33,8 @@
     arrowRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
     cap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>',
     book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>',
-    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>'
+    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>',
+    download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>'
   };
 
   /* ---------------------------- State ---------------------------- */
@@ -182,17 +183,21 @@
       case 'levels': {
         var keys = ['A', 'B', 'C', 'D', 'E'];
         var lvs = keys.map(function (k, i) {
-          var riskText = k === 'A' ? 'Highest risk level' : (k === 'E' ? 'Lowest risk level' : 'Risk level ' + k);
-          return '<button type="button" class="level lv-' + k.toLowerCase() + (i === 0 ? ' active' : '') + '" data-level="' + k + '" data-risk-text="' + esc(riskText) + '" aria-pressed="' + (i === 0) + '">' +
+          var cfg = (b.levels && b.levels[i]) || {};
+          var label = k === 'A' ? 'A = Highest risk level' : (k === 'E' ? 'E = Lowest risk level' : 'Risk level ' + k);
+          var noteText = cfg.note || 'Higher Risk Level → More Healthy Quota';
+          return '<button type="button" class="level lv-' + k.toLowerCase() + (i === 0 ? ' active' : '') + '" data-level="' + k + '" data-risk-text="' + esc(label) + '" data-note="' + esc(noteText) + '" aria-pressed="' + (i === 0) + '">' +
             '<span class="lv-key">' + k + '</span><span class="lv-toggle" aria-hidden="true">' + (i === 0 ? '−' : '+') + '</span></button>';
         }).join('');
+        var defNote = (b.levels && b.levels[0] && b.levels[0].note) || 'Higher Risk Level → More Healthy Quota';
+        var defLabel = 'A = Highest risk level';
         return '<div class="levels" data-reveal>' +
           '<div class="levels-row">' + lvs + '</div>' +
           '<div class="levels-scale"><span>Highest</span><span>Lowest</span></div>' +
-          '<div class="level-detail" data-level-detail>' +
+          '<div class="level-detail ld-tone-a" data-level-detail>' +
           '<div class="ld-letter" data-ld-letter>A</div>' +
-          '<div class="ld-text-wrap"><p class="ld-text" data-ld-text>A = Highest risk level</p>' +
-          '<p class="ld-map">Higher Risk Level → More Healthy Quota</p></div>' +
+          '<div class="ld-text-wrap"><p class="ld-text" data-ld-text>' + esc(defLabel) + '</p>' +
+          '<p class="ld-map" data-ld-map>' + esc(defNote) + '</p></div>' +
           '</div>' +
           '<p class="levels-note">' + esc(b.note) + '</p>' +
           '</div>';
@@ -551,7 +556,7 @@
       '<div class="cert-toolbar-row">' +
       '<input type="text" id="certName" maxlength="60" placeholder="Enter your full name" value="' + esc(name) + '" />' +
       '<button type="button" class="btn btn-soft" data-action="save-name">Update Name</button>' +
-      '<button type="button" class="btn btn-primary" data-action="print-cert">Print / Save PDF</button>' +
+      '<button type="button" class="btn btn-primary" data-action="download-cert">' + icon('download') + ' Download Certificate</button>' +
       '</div></div>' +
       '<div class="certificate" id="certificate" data-reveal>' +
       '<div class="cert-frame">' +
@@ -862,18 +867,15 @@
         setView('certificate');
         break;
       }
-      case 'print-cert': {
+      case 'download-cert': {
         var nameInput = document.getElementById('certName');
-        var certName = state.name;
-        if (nameInput && nameInput.value.trim()) {
-          var val = nameInput.value.trim();
-          if (state.name !== val) { state.name = val; saveState(); }
-          certName = val;
+        if (nameInput && nameInput.value.trim() && state.name !== nameInput.value.trim()) {
+          state.name = nameInput.value.trim();
+          saveState();
         }
-        if (!certName) { toast('Please enter your name before printing.'); return; }
-        var nameEl = document.querySelector('#certificate .cert-name');
-        if (nameEl) nameEl.textContent = certName;
-        setTimeout(function () { window.print(); }, 80);
+        if (!state.name) { toast('Please enter your name before downloading.'); return; }
+        syncCertName();
+        openDownloadModal();
         break;
       }
     }
@@ -891,6 +893,226 @@
     observeReveal();
     closeMobileNav();
     window.scrollTo(0, 0);
+  }
+
+  /* ---------------------------- Certificate download ---------------------------- */
+  function syncCertName() {
+    var nameEl = document.querySelector('#certificate .cert-name');
+    if (nameEl && state.name) nameEl.textContent = state.name;
+  }
+
+  function sanitizeFilePart(name) {
+    return String(name || '').trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+  }
+
+  function certFileName(ext) {
+    var base = 'PalmPay_Sales_Quota_Training_Certificate';
+    var n = sanitizeFilePart(state.name);
+    if (n) base = base + '_' + n;
+    return base + '.' + ext;
+  }
+
+  function downloadBlob(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 1500);
+  }
+
+  function renderCertificateToCanvas() {
+    var certEl = document.getElementById('certificate');
+    if (!certEl) return Promise.reject(new Error('Certificate not found'));
+    return new Promise(function (resolve, reject) {
+      try {
+        var DPR = 2;
+        var logicalW = 1240;
+        var svgNS = 'http://www.w3.org/2000/svg';
+        var xhtmlNS = 'http://www.w3.org/1999/xhtml';
+
+        var clone = certEl.cloneNode(true);
+        clone.style.width = logicalW + 'px';
+        clone.style.margin = '0';
+        clone.style.boxSizing = 'border-box';
+        clone.className = (clone.className ? clone.className + ' ' : '') + 'cert-export';
+
+        var svg = document.createElementNS(svgNS, 'svg');
+        svg.setAttribute('width', logicalW);
+        svg.style.cssText = 'position:absolute;left:-99999px;top:0;';
+
+        var fo = document.createElementNS(svgNS, 'foreignObject');
+        fo.setAttribute('width', '100%');
+        fo.setAttribute('height', '100%');
+
+        var div = document.createElementNS(xhtmlNS, 'div');
+        div.setAttribute('xmlns', xhtmlNS);
+        div.style.width = logicalW + 'px';
+        div.appendChild(clone);
+
+        fo.appendChild(div);
+        svg.appendChild(fo);
+        document.body.appendChild(svg);
+
+        var rect = clone.getBoundingClientRect();
+        var logicalH = Math.max(Math.round(rect.height), 700);
+        svg.setAttribute('width', logicalW);
+        svg.setAttribute('height', logicalH);
+        fo.setAttribute('width', logicalW);
+        fo.setAttribute('height', logicalH);
+
+        var draw = function () {
+          try {
+            var canvas = document.createElement('canvas');
+            canvas.width = Math.round(logicalW * DPR);
+            canvas.height = Math.round(logicalH * DPR);
+            var ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(svg, 0, 0, canvas.width, canvas.height);
+            document.body.removeChild(svg);
+            resolve({ canvas: canvas, width: canvas.width, height: canvas.height });
+          } catch (err) {
+            if (svg.parentNode) svg.parentNode.removeChild(svg);
+            reject(err);
+          }
+        };
+
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(draw).catch(draw);
+        } else {
+          draw();
+        }
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  function canvasToJpegBlob(canvas) {
+    return new Promise(function (resolve, reject) {
+      try {
+        canvas.toBlob(function (blob) {
+          if (blob) resolve(blob);
+          else reject(new Error('Could not create JPEG image.'));
+        }, 'image/jpeg', 0.92);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  function buildPdfFromJpeg(jpeg, wPx, hPx) {
+    var pageW = 841.89, pageH = 595.28;
+    var scale = pageW / wPx;
+    var drawW = pageW, drawH = Math.round(hPx * scale);
+    if (drawH > pageH) {
+      drawH = pageH;
+      drawW = Math.round(drawH * (wPx / hPx));
+    }
+    var x = (pageW - drawW) / 2, y = (pageH - drawH) / 2;
+
+    var buf = [];
+    var offs = [];
+    var push = function (s) {
+      for (var i = 0; i < s.length; i++) buf.push(s.charCodeAt(i) & 0xff);
+    };
+    var pushBytes = function (u8) {
+      for (var i = 0; i < u8.length; i++) buf.push(u8[i]);
+    };
+    var addObj = function (num, body, streamBytes) {
+      offs[num] = buf.length;
+      push(num + ' 0 obj\n');
+      push(body + '\n');
+      if (streamBytes) {
+        push('stream\n');
+        pushBytes(streamBytes);
+        push('\nendstream\n');
+      }
+      push('endobj\n');
+    };
+
+    push('%PDF-1.4\n%\u00E2\u00E3\u00CF\u00D3\n');
+    addObj(1, '<< /Type /Catalog /Pages 2 0 R >>');
+    addObj(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+    addObj(3, '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + pageW + ' ' + pageH + '] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>');
+    addObj(4, '<< /Type /XObject /Subtype /Image /Width ' + wPx + ' /Height ' + hPx + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + jpeg.length + ' >>', jpeg);
+    var cs = 'q\n' + drawW.toFixed(2) + ' 0 0 ' + drawH.toFixed(2) + ' ' + x.toFixed(2) + ' ' + y.toFixed(2) + ' cm\n/Im0 Do\nQ\n';
+    addObj(5, '<< /Length ' + cs.length + ' >>', (function () {
+      var bytes = new Uint8Array(cs.length);
+      for (var i = 0; i < cs.length; i++) bytes[i] = cs.charCodeAt(i) & 0xff;
+      return bytes;
+    })());
+
+    var xrefPos = buf.length;
+    push('xref\n0 6\n');
+    push('0000000000 65535 f \n');
+    for (var n = 1; n <= 5; n++) {
+      push(('0000000000' + offs[n]).slice(-10) + ' 00000 n \n');
+    }
+    push('trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n' + xrefPos + '\n%%EOF\n');
+    return new Uint8Array(buf);
+  }
+
+  function setModalBusy(busy) {
+    var card = document.querySelector('#dlModal .dl-card');
+    if (!card) return;
+    var btns = card.querySelectorAll('[data-dl]');
+    for (var i = 0; i < btns.length; i++) btns[i].disabled = busy;
+    if (busy) {
+      card.classList.add('busy');
+    } else {
+      card.classList.remove('busy');
+    }
+  }
+
+  function downloadCertCertificate(kind) {
+    if (!state.name) { toast('Please enter your name before downloading.'); return; }
+    syncCertName();
+    setModalBusy(true);
+    renderCertificateToCanvas()
+      .then(function (res) {
+        return canvasToJpegBlob(res.canvas).then(function (jpegBlob) {
+          var out;
+          if (kind === 'pdf') {
+            return jpegBlob.arrayBuffer().then(function (ab) {
+              out = buildPdfFromJpeg(new Uint8Array(ab), res.width, res.height);
+              downloadBlob(new Blob([out], { type: 'application/pdf' }), certFileName('pdf'));
+            });
+          }
+          downloadBlob(jpegBlob, certFileName('jpg'));
+        });
+      })
+      .then(function () {
+        setModalBusy(false);
+        closeDownloadModal();
+        toast(kind === 'pdf' ? 'Certificate downloaded as PDF' : 'Certificate downloaded as JPG');
+      })
+      .catch(function (err) {
+        setModalBusy(false);
+        toast('Could not generate the certificate. Please try again.');
+      });
+  }
+
+  function openDownloadModal() {
+    var m = document.getElementById('dlModal');
+    if (!m) return;
+    m.classList.add('show');
+    m.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDownloadModal() {
+    var m = document.getElementById('dlModal');
+    if (m) {
+      m.classList.remove('show');
+      m.setAttribute('aria-hidden', 'true');
+    }
+    document.body.style.overflow = '';
   }
 
   function toggleExpand(card, headBtn) {
@@ -918,10 +1140,15 @@
     if (tgl) tgl.textContent = '−';
     var letter = btn.getAttribute('data-level');
     var riskText = btn.getAttribute('data-risk-text');
+    var note = btn.getAttribute('data-note');
+    var detail = lv.querySelector('[data-level-detail]');
     var letterEl = lv.querySelector('[data-ld-letter]');
     var textEl = lv.querySelector('[data-ld-text]');
+    var mapEl = lv.querySelector('[data-ld-map]');
+    if (detail) detail.className = 'level-detail ld-tone-' + letter.toLowerCase();
     if (letterEl) letterEl.textContent = letter;
     if (textEl) textEl.textContent = riskText;
+    if (mapEl) mapEl.textContent = note;
   }
 
   function toggleCheck(item) {
@@ -1018,6 +1245,25 @@
     });
 
     document.getElementById('view').addEventListener('click', onViewClick);
+
+    var modal = document.getElementById('dlModal');
+    modal.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-dl]');
+      if (!btn) {
+        if (e.target === modal) closeDownloadModal();
+        return;
+      }
+      var kind = btn.getAttribute('data-dl');
+      if (kind === 'backdrop' || kind === 'cancel') {
+        closeDownloadModal();
+      } else if (kind === 'pdf' || kind === 'jpg') {
+        downloadCertCertificate(kind);
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeDownloadModal();
+    });
   }
 
   /* ---------------------------- Init ---------------------------- */

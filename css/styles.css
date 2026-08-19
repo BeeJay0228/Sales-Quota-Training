@@ -211,6 +211,8 @@ input, button { font-family: inherit; }
 
 .nav-ok { color: var(--green); }
 
+.nav-lock { color: rgba(255, 255, 255, .45); }
+
 .sidebar-footer { padding: 14px 18px 20px; border-top: 1px solid rgba(255, 255, 255, .08); }
 
 .mini-progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }

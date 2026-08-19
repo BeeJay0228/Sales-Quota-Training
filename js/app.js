@@ -111,6 +111,14 @@
     return !!(state.assessment && state.assessment.passed);
   }
 
+  function allSectionsCompleted() {
+    var sections = window.COURSE.sections;
+    for (var i = 0; i < sections.length; i++) {
+      if (state.completedSections.indexOf(sections[i].id) === -1) return false;
+    }
+    return true;
+  }
+
   function formatDate(iso) {
     if (!iso) return '—';
     var d = new Date(iso);
@@ -441,6 +449,18 @@
     return viewAssessmentQuiz();
   }
 
+  function viewAssessmentLocked() {
+    var completed = state.completedSections.length;
+    var total = window.COURSE.sections.length;
+    return '' +
+      '<div class="cert-locked" data-reveal>' +
+      '<div class="cert-locked-ic">' + icon('lock') + '</div>' +
+      '<h2 class="cert-locked-title">Assessment Locked</h2>' +
+      '<p class="cert-locked-text">Complete all ' + total + ' sections first (' + completed + ' / ' + total + ' completed) to unlock the Knowledge Assessment.</p>' +
+      '<button type="button" class="btn btn-primary" data-action="continue">Continue Training ' + icon('arrowRight') + '</button>' +
+      '</div>';
+  }
+
   function viewAssessmentQuiz() {
     var qs = window.ASSESSMENT.questions;
     if (assess.index >= qs.length) assess = { index: 0, answers: {} };
@@ -604,6 +624,11 @@
         break;
       }
       case 'assessment':
+        if (!allSectionsCompleted()) {
+          html = viewAssessmentLocked();
+          crumb = 'Knowledge Assessment';
+          break;
+        }
         html = viewAssessment();
         crumb = 'Knowledge Assessment';
         break;
@@ -656,6 +681,7 @@
         if (state.completedSections.indexOf(sid) !== -1) status = '<span class="nav-status nav-ok">' + icon('check') + '</span>';
       } else if (it.view === 'assessment') {
         if (isPassed()) status = '<span class="nav-status nav-ok">' + icon('check') + '</span>';
+        else if (!allSectionsCompleted()) status = '<span class="nav-status nav-lock">' + icon('lock') + '</span>';
       } else if (it.view === 'certificate') {
         if (state.completed) status = '<span class="nav-status nav-ok">' + icon('check') + '</span>';
       }

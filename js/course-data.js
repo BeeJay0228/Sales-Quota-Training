@@ -604,7 +604,7 @@ window.ASSESSMENT = {
       options: [
         "Risk levels are permanent and never change",
         "Higher Risk Level → More Healthy Quota",
-        "Lower Risk Level → Restricted or Zero Quota",
+        "Lower Risk Level → Moderate Quota",
         "Risk level is decided once per quarter"
       ],
       answer: 1
@@ -674,7 +674,7 @@ window.ASSESSMENT = {
       options: [
         "Using all available quota as quickly as possible",
         "Relying on temporary adjustments every week",
-        "Introducing customers without verifying repayment capacity",
+        "Introducing customers with moderate repayment capacity",
         "No agency, packaging or misleading sales, and no private collection of money from merchants"
       ],
       answer: 3

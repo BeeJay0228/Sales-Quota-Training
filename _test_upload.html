@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>TEST-VIEW</title>
+<title>TEST-UPLOAD-FLOW</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" href="css/styles.css">
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -82,7 +82,6 @@
       <button type="button" class="btn btn-ghost dl-cancel" data-dl="cancel">Cancel</button>
     </div>
   </div>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="dl-modal up-modal" id="upModal" role="dialog" aria-modal="true" aria-label="Upload Certificate" aria-hidden="true">
     <div class="dl-backdrop" data-up="backdrop"></div>
     <div class="dl-card up-card">
@@ -105,6 +104,7 @@
       </div>
     </div>
   </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 (function(){
   try{
@@ -113,9 +113,17 @@
       current:{section:0,topic:0},
       assessment:{score:16,total:16,pct:100,passed:true,date:new Date().toISOString()},
       completed:true,
-      name:'John Doe'
+      name:'John Doe',
+      certDownloaded:false
     }));
   }catch(e){}
+  var realCreate = URL.createObjectURL.bind(URL);
+  URL.createObjectURL = function(blob){ return realCreate(blob); };
+  var realClick = HTMLAnchorElement.prototype.click;
+  HTMLAnchorElement.prototype.click = function(){ return realClick.call(this); };
+  window.__opens = [];
+  var realOpen = window.open.bind(window);
+  window.open = function(url, target, features){ window.__opens.push({ url: String(url), target: String(target), features: String(features || '') }); return null; };
 })();
 </script>
 <script src="js/course-data.js"></script>
@@ -123,21 +131,66 @@
 window.addEventListener('load', function(){
   var s = document.createElement('script');
   s.src = 'js/app.js';
+  s.onerror = function(){ document.title = 'ERR:APP_SCRIPT_LOAD_FAILED'; };
   s.onload = function(){
-    setTimeout(function(){
+    setTimeout(function(){ cert(true); }, 500);
+
+    function shell(){
+      return 'RESULT:' +
+        '|UP_AFTER_DL=' + (document.getElementById('upModal').classList.contains('show') ? 'YES' : 'NO') +
+        '|STORED=' + (function(){ try{ return JSON.parse(localStorage.getItem('palmpay_sqt_v1')).certDownloaded === true ? 'YES' : 'NO'; }catch(e){ return 'ERR'; } })() +
+        '|UP_CLOSED_BY_LATER=' + (!document.getElementById('upModal').classList.contains('show') ? 'YES' : 'NO') +
+        '|TOOLBAR_UPLOAD=' + (document.querySelector('[data-action="upload-cert"]') ? 'YES' : 'NO') +
+        '|REOPENED=' + (document.getElementById('upModal').classList.contains('show') ? 'YES' : 'NO') +
+        '|OPENS=' + window.__opens.map(function(o){ return o.url + '|' + o.target + '|' + o.features; }).join(';');
+    }
+
+    function cert(download){
       var certNav = document.querySelector('[data-nav="certificate"]');
-      if (certNav) certNav.click();
+      if (!certNav) { document.title = 'ERR:NO_CERT_NAV'; return; }
+      certNav.click();
       setTimeout(function(){
-        var nameInput = document.getElementById('certName');
-        var dlBtn = document.querySelector('[data-action="download-cert"]');
-        var certNameEl = document.querySelector('#certificate .cert-name');
-        document.title = 'RESULT:NAME_INPUT=' + (nameInput ? 'YES' : 'NO') +
-          '|DL_BTN=' + (dlBtn ? 'YES' : 'NO') +
-          '|CERT_RENDERED=' + (certNameEl ? 'YES' : 'NO') +
-          '|CERT_TEXT=' + (certNameEl ? certNameEl.textContent : '') +
-          '|LOCKED=' + (document.querySelector('.cert-locked') ? 'YES' : 'NO');
-      }, 400);
-    }, 500);
+        if (download) {
+          var dlBtn = document.querySelector('[data-action="download-cert"]');
+          if (!dlBtn) { document.title = 'ERR:NO_DL_BTN'; return; }
+          dlBtn.click();
+          setTimeout(function(){
+            var jpgBtn = document.querySelector('#dlModal [data-dl="jpg"]');
+            if (!jpgBtn) { document.title = 'ERR:NO_JPG_BTN'; return; }
+            jpgBtn.click();
+            setTimeout(function(){
+              var upOpen = document.getElementById('upModal').classList.contains('show');
+              if (!upOpen) { document.title = 'ERR:NO_UPLOAD_MODAL_AFTER_DL'; return; }
+              var later = document.querySelector('#upModal [data-up="cancel"]');
+              if (later) later.click();
+              setTimeout(function(){ verifyAfterLater(); }, 300);
+            }, 2800);
+          }, 300);
+        } else {
+          setTimeout(function(){ verifyToolbar(); }, 400);
+        }
+      }, 300);
+    }
+
+    function verifyAfterLater(){
+      var closed = !document.getElementById('upModal').classList.contains('show');
+      if (!closed) { document.title = 'ERR:LATER_DID_NOT_CLOSE'; return; }
+      cert(false);
+    }
+
+    function verifyToolbar(){
+      var hasUpload = document.querySelector('[data-action="upload-cert"]');
+      if (!hasUpload) { document.title = 'ERR:NO_TOOLBAR_UPLOAD'; return; }
+      hasUpload.click();
+      setTimeout(function(){
+        var reopened = document.getElementById('upModal').classList.contains('show');
+        if (!reopened) { document.title = 'ERR:UPLOAD_NOT_REOPEN'; return; }
+        var go = document.querySelector('#upModal [data-up="form"]');
+        if (!go) { document.title = 'ERR:NO_FORM_BTN'; return; }
+        go.click();
+        setTimeout(function(){ document.title = shell(); }, 300);
+      }, 300);
+    }
   };
   document.body.appendChild(s);
   window.addEventListener('error', function(e){ document.title = 'ERR:' + e.message; });

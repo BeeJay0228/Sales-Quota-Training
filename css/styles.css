@@ -1785,10 +1785,34 @@ input, button { font-family: inherit; }
 .dl-card.busy .dl-cancel,
 .dl-card.busy .dl-close { cursor: wait; }
 
+.dl-success-ic {
+  width: 56px;
+  height: 56px;
+  flex: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 10px 24px rgba(0, 185, 112, .35);
+}
+
+.dl-success-ic svg { width: 26px; height: 26px; }
+
+.up-text { font-size: 14px; color: var(--text); line-height: 1.55; margin-bottom: 20px; }
+
+.up-actions .btn { width: 100%; }
+
+.up-actions .btn-primary { padding-top: 13px; padding-bottom: 13px; }
+
+.up-hint { font-size: 12.5px; color: var(--muted); text-align: center; margin: 10px 0 4px; }
+
 @media (max-width: 560px) {
   .dl-modal { padding: 14px; }
   .dl-card { padding: 22px 18px; }
   .dl-opt { padding: 13px 14px; }
+  .dl-success-ic { width: 48px; height: 48px; }
+  .up-actions .btn-primary { padding-top: 14px; padding-bottom: 14px; }
 }
 
 /* ---------------------------- Toast ---------------------------- */

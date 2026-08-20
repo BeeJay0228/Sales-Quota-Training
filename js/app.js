@@ -34,11 +34,14 @@
     cap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>',
     book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>',
     info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>',
-    download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>'
+    download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>',
+    upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 8l5-5 5 5"/><path d="M12 3v12"/></svg>',
+    external: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>'
   };
 
   /* ---------------------------- State ---------------------------- */
   var LS_KEY = 'palmpay_sqt_v1';
+  var CERT_FORM_URL = 'https://forms.gle/WbUFGQNfbHyeb6j19';
 
   function defaultState() {
     return {
@@ -46,7 +49,8 @@
       current: { section: 0, topic: 0 },
       assessment: null,
       completed: false,
-      name: ''
+      name: '',
+      certDownloaded: false
     };
   }
 
@@ -61,7 +65,8 @@
           current: parsed.current || base.current,
           assessment: parsed.assessment || null,
           completed: !!parsed.completed,
-          name: parsed.name || ''
+          name: parsed.name || '',
+          certDownloaded: !!parsed.certDownloaded
         };
       }
     } catch (e) { /* ignore corrupted storage */ }
@@ -577,6 +582,7 @@
       '<input type="text" id="certName" maxlength="60" placeholder="Enter your full name" value="' + esc(name) + '" />' +
       '<button type="button" class="btn btn-soft" data-action="save-name">Update Name</button>' +
       '<button type="button" class="btn btn-primary" data-action="download-cert">' + icon('download') + ' Download Certificate</button>' +
+      (state.certDownloaded ? '<button type="button" class="btn btn-soft" data-action="upload-cert">' + icon('upload') + ' Upload Certificate</button>' : '') +
       '</div></div>' +
       '<div class="certificate" id="certificate" data-reveal>' +
       '<div class="cert-frame">' +
@@ -904,6 +910,9 @@
         openDownloadModal();
         break;
       }
+      case 'upload-cert':
+        openUploadModal();
+        break;
     }
   }
 
@@ -1120,12 +1129,15 @@
       .then(function () {
         setModalBusy(false);
         closeDownloadModal();
+        state.certDownloaded = true;
+        saveState();
         toast(kind === 'pdf' ? 'Certificate downloaded as PDF' : 'Certificate downloaded as JPG');
+        openUploadModal();
       })
-.catch(function (err) {
-            setModalBusy(false);
-            toast('Could not generate the certificate. Please try again.');
-          });
+      .catch(function (err) {
+        setModalBusy(false);
+        toast('Could not generate the certificate. Please try again.');
+      });
   }
 
   function openDownloadModal() {
@@ -1143,6 +1155,28 @@
       m.setAttribute('aria-hidden', 'true');
     }
     document.body.style.overflow = '';
+  }
+
+  function openUploadModal() {
+    var m = document.getElementById('upModal');
+    if (!m) return;
+    m.classList.add('show');
+    m.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeUploadModal() {
+    var m = document.getElementById('upModal');
+    if (m) {
+      m.classList.remove('show');
+      m.setAttribute('aria-hidden', 'true');
+    }
+    document.body.style.overflow = '';
+  }
+
+  function openCertificateForm() {
+    window.open(CERT_FORM_URL, '_blank', 'noopener,noreferrer');
+    closeUploadModal();
   }
 
   function toggleExpand(card, headBtn) {
@@ -1291,8 +1325,26 @@
       }
     });
 
+    var upModal = document.getElementById('upModal');
+    upModal.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-up]');
+      if (!btn) {
+        if (e.target === upModal) closeUploadModal();
+        return;
+      }
+      var kind = btn.getAttribute('data-up');
+      if (kind === 'backdrop' || kind === 'cancel') {
+        closeUploadModal();
+      } else if (kind === 'form') {
+        openCertificateForm();
+      }
+    });
+
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeDownloadModal();
+      if (e.key === 'Escape') {
+        closeDownloadModal();
+        closeUploadModal();
+      }
     });
   }
 

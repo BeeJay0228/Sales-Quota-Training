@@ -83,6 +83,28 @@
     </div>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="dl-modal up-modal" id="upModal" role="dialog" aria-modal="true" aria-label="Upload Certificate" aria-hidden="true">
+    <div class="dl-backdrop" data-up="backdrop"></div>
+    <div class="dl-card up-card">
+      <button type="button" class="dl-close" data-up="cancel" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="dl-head">
+        <div class="dl-success-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <div>
+          <h3 class="dl-title">Certificate Downloaded Successfully</h3>
+        </div>
+      </div>
+      <p class="up-text">Your certificate has been successfully downloaded. Please complete the final step by uploading your certificate using the submission form below.</p>
+      <div class="up-actions">
+        <button type="button" class="btn btn-primary" data-up="form">Upload Certificate</button>
+        <p class="up-hint">Click the button to open the certificate submission form.</p>
+        <button type="button" class="btn btn-ghost" data-up="cancel">Later</button>
+      </div>
+    </div>
+  </div>
 <script>
 (function(){
   var unlock = (location.hash === '#unlocked');

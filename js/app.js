@@ -1,6 +1,6 @@
 /* ============================================================
    Sales Quota Training — Application Logic
-   PalmPay Loan Sales Academy · August 2026
+   PalmPay Loan Sales Team · August 2026
    Vanilla JS only. No frameworks.
    ============================================================ */
 (function () {
@@ -371,7 +371,7 @@
     return '' +
       '<section class="dash-hero" data-reveal>' +
       '<div class="hero-glow" aria-hidden="true"></div>' +
-      '<div class="hero-badge">' + icon('cap') + ' PalmPay · Loan Sales Academy</div>' +
+      '<div class="hero-badge">' + icon('cap') + ' PalmPay · Loan Sales Team</div>' +
       '<h1 class="hero-title">Sales Quota Training</h1>' +
       '<p class="hero-sub">' + esc(window.COURSE.subtitle) + '</p>' +
       '<div class="hero-chips">' +
@@ -588,7 +588,7 @@
       '<div class="certificate" id="certificate" data-reveal>' +
       '<div class="cert-frame">' +
       '<div class="cert-inner">' +
-      '<div class="cert-brand"><span class="cert-brand-mark">' + icon('brand') + '</span><div><span class="cert-brand-name">PalmPay</span><span class="cert-brand-sub">Loan Sales Academy</span></div></div>' +
+      '<div class="cert-brand"><span class="cert-brand-mark">' + icon('brand') + '</span><div><span class="cert-brand-name">PalmPay</span><span class="cert-brand-sub">Loan Sales Team</span></div></div>' +
       '<div class="cert-award">' + icon('award') + '</div>' +
       '<h2 class="cert-title">Certificate of Completion</h2>' +
       '<p class="cert-line">This is to certify that</p>' +
@@ -602,7 +602,7 @@
       '<div class="cert-meta-item"><span>Certificate ID</span><strong>' + esc(certId()) + '</strong></div>' +
       '</div>' +
       '<div class="cert-footer">' +
-      '<div class="cert-sign"><div class="sign-line"></div><span>PalmPay Loan Sales Academy</span></div>' +
+      '<div class="cert-sign"><div class="sign-line"></div><span>PalmPay Loan Sales Team</span></div>' +
       '<div class="cert-date">' + esc(window.COURSE.date) + '</div>' +
       '</div>' +
       '</div></div></div></div>';

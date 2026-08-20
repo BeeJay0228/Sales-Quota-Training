@@ -1,6 +1,6 @@
 /* ============================================================
    Sales Quota Training — Course Content Data
-   PalmPay Loan Sales Academy · August 2026
+   PalmPay Loan Sales Team · August 2026
    Authoritative source: Sales Quota Training PowerPoint
    ============================================================ */
 
@@ -8,7 +8,7 @@ window.COURSE = {
   title: "Sales Quota Training",
   subtitle: "Understanding weekly credit control, risk stratification, and how to sustainably grow your quota",
   date: "August 2026",
-  academy: "PalmPay Loan Sales Academy",
+  academy: "PalmPay Loan Sales Team",
   overview: [
     "Why Sales Quota exists",
     "How quota works",

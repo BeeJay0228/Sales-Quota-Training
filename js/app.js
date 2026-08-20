@@ -1004,7 +1004,7 @@
           '<foreignObject width="100%" height="100%">' +
           '<div xmlns="http://www.w3.org/1999/xhtml" style="width:' + logicalW + 'px;">' +
           (cssText ? '<style>' + cssText + '</style>' : '') +
-          clone.outerHTML +
+          clone.outerHTML.replace(/<svg\b(?![^>]*xmlns=)/g, '<svg xmlns="http://www.w3.org/2000/svg"') +
           '</div></foreignObject></svg>';
 
         var url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgDoc);

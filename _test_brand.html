@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>TEST-CERT-DOWNLOADS</title>
+<title>LOADING</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" href="css/styles.css">
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -35,6 +35,11 @@
         <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
+      </div>
+      <div class="sidebar-course">
+        <span class="sidebar-course-chip">Training Course</span>
+        <h2 class="sidebar-course-title">Sales Quota Training</h2>
+        <p class="sidebar-course-sub">Weekly credit control, risk stratification &amp; sustainable quota growth</p>
       </div>
       <nav class="sidebar-nav" id="sidebarNav"></nav>
       <div class="sidebar-footer">
@@ -113,7 +118,6 @@
       </div>
     </div>
   </div>
-
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 (function(){
@@ -140,45 +144,76 @@
 })();
 </script>
 <script src="js/course-data.js"></script>
-<script src="js/export-css.js"></script>
 <script>
 window.addEventListener('load', function(){
   var s = document.createElement('script');
   s.src = 'js/app.js';
   s.onerror = function(){ document.title = 'ERR:APP_SCRIPT_LOAD_FAILED'; };
   s.onload = function(){
-    setTimeout(function(){
-      var certNav = document.querySelector('[data-nav="certificate"]');
-      if (certNav) certNav.click();
-      setTimeout(function(){
-        var dlBtn = document.querySelector('[data-action="download-cert"]');
-        if (!dlBtn) { document.title = 'TEST:NO_DL_BTN'; return; }
-        dlBtn.click();
-        setTimeout(function(){
-          var modal = document.getElementById('dlModal');
-          var pdfBtn = modal.querySelector('[data-dl="pdf"]');
-          if (!pdfBtn) { document.title = 'TEST:NO_PDF_BTN'; return; }
-          pdfBtn.click();
-          setTimeout(function(){
-            var dlBtn2 = document.querySelector('[data-action="download-cert"]');
-            if (dlBtn2) dlBtn2.click();
-            setTimeout(function(){
-              var modal2 = document.getElementById('dlModal');
-              var jpgBtn = modal2.querySelector('[data-dl="jpg"]');
-              if (jpgBtn) jpgBtn.click();
-              setTimeout(function(){
-                var files = window.__dls.filter(function(d){return d.kind==='file';}).map(function(d){return d.download;});
-                var blobs = window.__dls.filter(function(d){return d.kind==='blob';});
-                document.title = 'RESULT:FILES=' + files.join(';') + '|BLOBTYPES=' + blobs.map(function(b){return b.type;}).join(';') + '|BLOBSIZES=' + blobs.map(function(b){return b.size;}).join(';');
-              }, 4000);
-            }, 400);
-          }, 2500);
-        }, 400);
-      }, 400);
-    }, 500);
+    setTimeout(function(){ document.title = 'STEP:APP'; try { checkDashboard(); } catch (e) { document.title = 'ERR:' + (e && e.message); } }, 500);
   };
-  document.body.appendChild(s);
   window.addEventListener('error', function(e){ document.title = 'ERR:' + e.message; });
+  document.body.appendChild(s);
+
+  function cs(el, prop){ return el ? getComputedStyle(el).getPropertyValue(prop).trim() : ''; }
+
+  function checkDashboard(){
+    var root = document.documentElement;
+    var token = cs(root, '--purple');
+    var logo = document.querySelector('.sidebar .brand-mark svg linearGradient stop');
+    var logoOk = !!(logo && logo.getAttribute('stop-color') === '#8b5cf6' && document.querySelector('.sidebar .brand-mark svg').getAttribute('viewBox') === '0 0 48 48');
+    var btn = document.querySelector('.btn-primary');
+    var bg = btn ? getComputedStyle(btn).backgroundImage : '';
+    var btnPurple = /rgb\(124, 58, 237\)|rgb\(139, 92, 246\)|rgb\(109, 40, 217\)|rgb\(124 58 237\)/.test(bg) && !/rgb\(0, 185, 112\)|rgb\(0 185 112\)/.test(bg);
+    var heroBadge = cs(document.querySelector('.hero-badge'), 'color');
+    var navActive = document.querySelector('.nav-item.active');
+    var navBg = navActive ? getComputedStyle(navActive).backgroundImage : '';
+    var navPurple = /rgba?\(124, 58, 237/.test(navBg);
+    var navOk = cs(document.querySelector('.nav-ok'), 'color');
+    var sidebarBg = cs(document.querySelector('.sidebar'), 'background-image');
+    var sidebarPurple = /rgb\(37, 19, 74\)|rgb\(26, 16, 52\)/.test(sidebarBg);
+    var overflow = document.documentElement.scrollWidth <= window.innerWidth;
+    document.title = 'STEP:DB';
+
+    var r = 'RESULT:' +
+      'TOKEN=' + token +
+      '|LOGO=' + (logoOk ? 'YES' : 'NO') +
+      '|BTN=' + (btnPurple ? 'PURPLE' : 'OTHER') +
+      '|HERO_BADGE=' + heroBadge +
+      '|NAV_ACTIVE=' + (navPurple ? 'PURPLE' : 'OTHER') +
+      '|NAV_OK=' + navOk +
+      '|SIDEBAR=' + (sidebarPurple ? 'PURPLE' : 'OTHER') +
+      '|OVERFLOW=' + (overflow ? 'NO' : 'YES');
+    window.__r = r;
+    var certNav = document.querySelector('[data-nav="certificate"]');
+    if (!certNav) { document.title = r; return; }
+    certNav.click();
+    setTimeout(function(){ document.title = 'STEP:CERT'; try { checkCert(); } catch (e) { document.title = 'ERR:' + (e && e.message); } }, 400);
+  }
+
+  function checkCert(){
+    var certMark = document.querySelector('.cert-brand-mark svg linearGradient stop');
+    var certMarkOk = !!(certMark && certMark.getAttribute('stop-color') === '#8b5cf6');
+    var frame = cs(document.querySelector('.cert-frame'), 'border-top-color');
+    var certName = cs(document.querySelector('.cert-name'), 'color');
+    var dlBtn = document.querySelector('[data-action="download-cert"]');
+    if (!dlBtn) { finish('NO_DL_BTN'); return; }
+    dlBtn.click();
+    setTimeout(function(){
+      var jpg = document.querySelector('#dlModal [data-dl="jpg"]');
+      if (!jpg) { finish('NO_JPG_BTN'); return; }
+      jpg.click();
+      setTimeout(function(){
+        var upShow = document.getElementById('upModal').classList.contains('show');
+        var up = upShow ? 'YES' : 'NO';
+        finish('CERT_MARK=' + (certMarkOk ? 'YES' : 'NO') + '|FRAME=' + frame + '|NAME=' + certName + '|UPSHOW=' + up);
+      }, 2800);
+    }, 300);
+  }
+
+  function finish(extra){
+    document.title = window.__r + '|' + extra;
+  }
 });
 </script>
 </body>

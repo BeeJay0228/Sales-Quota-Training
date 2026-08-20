@@ -36,7 +36,8 @@
     info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>',
     download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>',
     upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 8l5-5 5 5"/><path d="M12 3v12"/></svg>',
-    external: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>'
+    external: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>',
+    brand: '<svg viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="ppmark-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#6d28d9"/></linearGradient></defs><path fill="url(#ppmark-g)" stroke="#ffffff" stroke-opacity=".9" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" d="M21.157 4.262a5.69 5.69 0 0 1 5.685 0l12.83 7.407a5.69 5.69 0 0 1 2.843 4.924v14.814a5.69 5.69 0 0 1-2.843 4.924l-12.83 7.407a5.69 5.69 0 0 1-5.685 0l-12.83-7.407a5.69 5.69 0 0 1-2.842-4.924V16.593a5.69 5.69 0 0 1 2.842-4.924z"/><g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"><rect width="5.053" height="5.053" x="21.473" y="21.473" rx="0.632" ry="0.632" transform="rotate(-45 24 24)"/><path d="M5.565 29.88l17.44-17.441a1.263 1.263 0 0 1 1.766-.021l7.432 7.089m10.245-.897L25.007 36.051a1.263 1.263 0 0 1-1.766.021l-7.431-7.088"/></g></svg>'
   };
 
   /* ---------------------------- State ---------------------------- */
@@ -587,7 +588,7 @@
       '<div class="certificate" id="certificate" data-reveal>' +
       '<div class="cert-frame">' +
       '<div class="cert-inner">' +
-      '<div class="cert-brand"><span class="cert-brand-mark">' + icon('shield') + '</span><div><span class="cert-brand-name">PalmPay</span><span class="cert-brand-sub">Loan Sales Academy</span></div></div>' +
+      '<div class="cert-brand"><span class="cert-brand-mark">' + icon('brand') + '</span><div><span class="cert-brand-name">PalmPay</span><span class="cert-brand-sub">Loan Sales Academy</span></div></div>' +
       '<div class="cert-award">' + icon('award') + '</div>' +
       '<h2 class="cert-title">Certificate of Completion</h2>' +
       '<p class="cert-line">This is to certify that</p>' +
